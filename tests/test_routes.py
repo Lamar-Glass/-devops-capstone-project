@@ -198,6 +198,27 @@ class TestAccountService(TestCase):
         data = resp.get_json()
         self.assertEqual(len(data), 5)
 
+# ----------------------------------------------------------
+    # TEST SECURITY HEADERS (Talisman)
+    # ----------------------------------------------------------
+    def test_security_headers_present(self):
+        """It should return security headers with every response"""
+        resp = self.client.get("/health")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.headers.get("X-Frame-Options"), "SAMEORIGIN")
+        self.assertEqual(resp.headers.get("X-Content-Type-Options"), "nosniff")
+        self.assertIn("Strict-Transport-Security", resp.headers)
+        self.assertIn("Referrer-Policy", resp.headers)
+
+    # ----------------------------------------------------------
+    # TEST CORS HEADERS (Flask-Cors)
+    # ----------------------------------------------------------
+    def test_cors_headers(self):
+        """It should return CORS headers allowing cross-origin requests"""
+        resp = self.client.get("/health")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.headers.get("Access-Control-Allow-Origin"), "*")
+
     def test_list_empty_accounts(self):
         """It should return an empty list when there are no Accounts"""
         resp = self.client.get(BASE_URL)
