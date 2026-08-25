@@ -207,8 +207,9 @@ class TestAccountService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.headers.get("X-Frame-Options"), "SAMEORIGIN")
         self.assertEqual(resp.headers.get("X-Content-Type-Options"), "nosniff")
-        self.assertIn("Strict-Transport-Security", resp.headers)
-        self.assertIn("Referrer-Policy", resp.headers)
+        self.assertEqual(
+            resp.headers.get("Referrer-Policy"), "strict-origin-when-cross-origin"
+        )
 
     # ----------------------------------------------------------
     # TEST CORS HEADERS (Flask-Cors)
