@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: accounts
+  labels:
+    app: accounts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: accounts
+  template:
+    metadata:
+      labels:
+        app: accounts
+    spec:
+      containers:
+        - name: accounts
+          # Built by the OpenShift BuildConfig and pushed to the
+          # internal image registry (imagestream devops-capstone)
+          image: image-registry.openshift-image-registry.svc:5000/sn-labs-lamarvantagl/devops-capstone:latest
+          imagePullPolicy: Always
+          env:
+            - name: DATABASE_URI
+              value: postgresql://postgres:postgres@postgresql:5432/postgres
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20
