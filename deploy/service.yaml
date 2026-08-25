@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customeraccounts
+  labels:
+    app: customeraccounts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: customeraccounts
+  template:
+    metadata:
+      labels:
+        app: customeraccounts
+    spec:
+      containers:
+        - name: customeraccounts
+          image: image-registry.openshift-image-registry.svc:5000/sn-labs-lamarvantagl/customeraccounts
+          imagePullPolicy: Always
+          env:
+            - name: DATABASE_URI
+              value: postgresql://user03D:siYExpTR2FKtIUKB@postgresql:5432/sampledb
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: customeraccounts
+  labels:
+    app: customeraccounts
+spec:
+  selector:
+    app: customeraccounts
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
